@@ -5,6 +5,7 @@ from django.urls import reverse
 from datetime import datetime, timedelta
 from django.test import tag
 
+from extractor_scripts.twitter_extractor import Scrapper
 
 @tag("busq")
 class BusquedaTest(APITestCase):
@@ -41,6 +42,7 @@ class BusquedaTest(APITestCase):
         response = self.client.post(self.url, self.data, format('json'))
         # response ok?
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
         #validar objeto
         self.assertEquals(response.json()['id_busqueda'], self.data['id_busqueda'])
         self.assertEquals(response.json()['user_id'], self.data['user_id'])
@@ -104,3 +106,10 @@ class BusquedaTest(APITestCase):
         self.assertEquals(response.json()[0]['mins'], self.data[2]['mins'])
         self.assertEquals(response.json()[0]['price'], self.data[2]['price'])
         self.assertEquals(response.json()[0]['timestamp'][:10], fecha_de_creacion[:10]) """
+    
+    @tag("selenium")
+    def test_open_selenium(self):
+        print("intentando abrir selenium")
+        scraper = Scrapper()
+        status_code = scraper.test()
+        self.assertEquals(status_code, status.HTTP_200_OK)
