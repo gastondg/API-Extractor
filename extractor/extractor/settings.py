@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'busqueda.apps.BusquedaConfig',
+    'tweets.apps.TweetsConfig',
 
 ]
 

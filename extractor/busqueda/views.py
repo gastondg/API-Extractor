@@ -25,7 +25,6 @@ class BusquedaListCreate(generics.ListCreateAPIView):
             
             return Response(busqueda_set.data, status=status.HTTP_201_CREATED)
             
-        print(busqueda_set.errors)
         return Response({
             'error' : busqueda_set.errors
         }, status=status.HTTP_400_BAD_REQUEST)
