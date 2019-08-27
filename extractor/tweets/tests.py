@@ -59,4 +59,32 @@ class TweetsTest(APITestCase):
         self.assertEquals(response.json()[0]['rts'], self.data[0]['rts'])
         self.assertEquals(response.json()[0]['link'], self.data[0]['link'])
         self.assertEquals(response.json()[0]['label'], self.data[0]['label'])
+
+    
+    def test_post_busqueda(self):
+
+        scraper = Scrapper()
+        busqueda = {
+                    'id_busqueda' : 1,
+                    'user_id' : 1,                
+                    'ands' : "",
+                    'phrase' : "",
+                    'ors' : "",
+                    'nots' : "",
+                    'tags' : "",
+                    'respondiendo' : "",
+                    'mencionando' : "",
+                    'From' : "@gdigiu",
+                    'fecha_hasta' : "2019-08-20",
+                    'fecha_desde' : "2019-08-07",
+                    'fecha_peticion' : "",
+                    'fecha_finalizacion' : "",
+                    'finalizado' : False
+                    }
         
+        tweets_json = scraper.selenium_get_tweets(**busqueda)
+        
+        # post tweets
+        response = self.client.post(self.url, tweets_json, format('json'))
+        # response ok?
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)

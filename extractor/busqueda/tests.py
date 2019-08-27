@@ -111,5 +111,5 @@ class BusquedaTest(APITestCase):
     def test_open_selenium(self):
         print("intentando abrir selenium")
         scraper = Scrapper()
-        status_code = scraper.test()
-        self.assertEquals(status_code, status.HTTP_200_OK)
+        scraper.test()
+        self.assertEquals(200, status.HTTP_200_OK)
