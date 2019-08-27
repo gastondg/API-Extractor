@@ -229,6 +229,6 @@ class Scrapper():
         driver.quit()
         
         tweets = self.get_tweets_soup(soup)
-        tweets_json = json.loads(tweets.to_json(orient='records'))
+        tweets_json = json.loads(tweets.to_json(orient='records', date_format='iso'))
         
         return tweets_json

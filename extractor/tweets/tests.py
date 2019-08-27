@@ -88,3 +88,5 @@ class TweetsTest(APITestCase):
         response = self.client.post(self.url, tweets_json, format('json'))
         # response ok?
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        print(tweets_json[:2])
+        
