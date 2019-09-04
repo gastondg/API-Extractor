@@ -33,7 +33,27 @@ class BusquedaTest(APITestCase):
           'fecha_desde' : "2019-03-25",
           'fecha_peticion' : "2019-03-25",
           'fecha_finalizacion' : "2019-03-25",
-          'finalizado' : False
+          'finalizado' : False,
+          'tiene_tweets' : False
+           }
+        
+        self.data2 = {
+          'id_busqueda' : 2,
+          'user_id' : 1,                
+          'ands' : "charfield testing",
+          'phrase' : "charfield testing",
+          'ors' : "charfield testing",
+          'nots' : "charfield testing",
+          'tags' : "charfield testing",
+          'respondiendo' : "charfield testing",
+          'mencionando' : "charfield testing",
+          'From' : "charfield testing",
+          'fecha_hasta' : "2019-03-25",
+          'fecha_desde' : "2019-03-25",
+          'fecha_peticion' : "2019-03-25",
+          'fecha_finalizacion' : "2019-03-25",
+          'finalizado' : True,
+          'tiene_tweets' : True
            }
 
     
@@ -59,57 +79,100 @@ class BusquedaTest(APITestCase):
         self.assertEquals(response.json()['fecha_peticion'], self.data['fecha_peticion'])
         self.assertEquals(response.json()['fecha_finalizacion'], self.data['fecha_finalizacion'])
         self.assertEquals(response.json()['finalizado'], self.data['finalizado'])
+        self.assertEquals(response.json()['tiene_tweets'], self.data['tiene_tweets'])
         
-        
-
     
-    """ def test_get_avgprice(self):
+    def test_get(self):
 
-        self.client.post(self.url, self.data, format('json'))
-        response = self.client.get(self.url)
-    
+        response = self.client.post(self.url, self.data, format('json'))
         # response ok?
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(len(response.json()), len(self.data))
-
-        fecha = str(datetime.utcnow().date())
-        #validar primer objeto
-        avg_price_json = response.json()[0]
-        avg_price_data = self.data[0]
-        self.assertEqual(avg_price_json['symbol'], avg_price_data['symbol'])
-        self.assertEqual(avg_price_json['mins'], avg_price_data['mins'])
-        self.assertEqual(avg_price_json['price'], avg_price_data['price'])
-        fecha_0 = avg_price_json['timestamp'][:10] #datos obtenidos del get
-        self.assertEquals(fecha_0, fecha)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        # hacemos el get
+        response_get = self.client.get(self.url)
+        self.assertEquals(response_get.status_code, status.HTTP_200_OK)
+        #validar objeto
+        self.assertEquals(response_get.json()[0]['id_busqueda'], self.data['id_busqueda'])
+        self.assertEquals(response_get.json()[0]['user_id'], self.data['user_id'])
+        self.assertEquals(response_get.json()[0]['ands'], self.data['ands'])
+        self.assertEquals(response_get.json()[0]['phrase'], self.data['phrase'])
+        self.assertEquals(response_get.json()[0]['ors'], self.data['ors'])
+        self.assertEquals(response_get.json()[0]['nots'], self.data['nots'])
+        self.assertEquals(response_get.json()[0]['tags'], self.data['tags'])
+        self.assertEquals(response_get.json()[0]['respondiendo'], self.data['respondiendo'])
+        self.assertEquals(response_get.json()[0]['mencionando'], self.data['mencionando'])
+        self.assertEquals(response_get.json()[0]['From'], self.data['From'])
+        self.assertEquals(response_get.json()[0]['fecha_hasta'], self.data['fecha_hasta'])
+        self.assertEquals(response_get.json()[0]['fecha_desde'], self.data['fecha_desde'])
+        self.assertEquals(response_get.json()[0]['fecha_peticion'], self.data['fecha_peticion'])
+        self.assertEquals(response_get.json()[0]['fecha_finalizacion'], self.data['fecha_finalizacion'])
+        self.assertEquals(response_get.json()[0]['finalizado'], self.data['finalizado'])
+        self.assertEquals(response_get.json()[0]['tiene_tweets'], self.data['tiene_tweets'])
         
-        #validar segundo objeto
-        avg_price_json = response.json()[1]
-        avg_price_data = self.data[1]
-        self.assertEqual(avg_price_json['symbol'], avg_price_data['symbol'])
-        self.assertEqual(avg_price_json['mins'], avg_price_data['mins'])
-        self.assertEqual(avg_price_json['price'], avg_price_data['price']) # datos obtenidos del get
-        fecha_1 = avg_price_json['timestamp'][:10]
-        self.assertEquals(fecha_1, fecha)
 
     
-    def test_get_avgprice_by_symbol(self):
-
-        r = self.client.post(self.url, self.data, format('json')) #deberia estar listo y sin errores
-        fecha_de_creacion = r.json()[2]['timestamp'] 
-        url = self.url + '?symbol=BTCUSDT'
-        response = self.client.get(url)
+    def test_get_byBusquedaId(self):
+        # primero el post para guardar los datos
+        response = self.client.post(self.url, self.data2, format('json'))
         # response ok?
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(len(response.json()), 1)
-        # validar el objeto obtenido
-        self.assertEquals(response.json()[0]['symbol'], self.data[2]['symbol'])
-        self.assertEquals(response.json()[0]['mins'], self.data[2]['mins'])
-        self.assertEquals(response.json()[0]['price'], self.data[2]['price'])
-        self.assertEquals(response.json()[0]['timestamp'][:10], fecha_de_creacion[:10]) """
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+        # definimos url para el get 
+        id_busqueda = self.data2['id_busqueda']
+        url = reverse('busqueda:busquedaById', args=[id_busqueda])
+        
+        # hacemos el get
+        response_get = self.client.get(url)
+        self.assertEquals(response_get.status_code, status.HTTP_200_OK)
+
+        #validar objeto
+        self.assertEquals(response_get.json()[0]['id_busqueda'], self.data2['id_busqueda'])
+        self.assertEquals(response_get.json()[0]['user_id'], self.data2['user_id'])
+        self.assertEquals(response_get.json()[0]['ands'], self.data2['ands'])
+        self.assertEquals(response_get.json()[0]['phrase'], self.data2['phrase'])
+        self.assertEquals(response_get.json()[0]['ors'], self.data2['ors'])
+        self.assertEquals(response_get.json()[0]['nots'], self.data2['nots'])
+        self.assertEquals(response_get.json()[0]['tags'], self.data2['tags'])
+        self.assertEquals(response_get.json()[0]['respondiendo'], self.data2['respondiendo'])
+        self.assertEquals(response_get.json()[0]['mencionando'], self.data2['mencionando'])
+        self.assertEquals(response_get.json()[0]['From'], self.data2['From'])
+        self.assertEquals(response_get.json()[0]['fecha_hasta'], self.data2['fecha_hasta'])
+        self.assertEquals(response_get.json()[0]['fecha_desde'], self.data2['fecha_desde'])
+        self.assertEquals(response_get.json()[0]['fecha_peticion'], self.data2['fecha_peticion'])
+        self.assertEquals(response_get.json()[0]['fecha_finalizacion'], self.data2['fecha_finalizacion'])
+        self.assertEquals(response_get.json()[0]['finalizado'], self.data2['finalizado'])
+        self.assertEquals(response_get.json()[0]['tiene_tweets'], self.data2['tiene_tweets'])  
+        
+
+    def test_get_finalizadas(self):
+        # primero el post para guardar los datos
+        response = self.client.post(self.url, self.data2, format('json'))
+        # response ok?
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+        # definimos url para el get 
+        url = reverse('busqueda:finalizadas')
+        
+        # hacemos el get
+        response_get = self.client.get(url)
+        self.assertEquals(response_get.status_code, status.HTTP_200_OK)
+
+        #validar objeto
+        self.assertEquals(response_get.json()[0]['id_busqueda'], self.data2['id_busqueda'])
+        self.assertEquals(response_get.json()[0]['user_id'], self.data2['user_id'])
+        self.assertEquals(response_get.json()[0]['ands'], self.data2['ands'])
+        self.assertEquals(response_get.json()[0]['phrase'], self.data2['phrase'])
+        self.assertEquals(response_get.json()[0]['ors'], self.data2['ors'])
+        self.assertEquals(response_get.json()[0]['nots'], self.data2['nots'])
+        self.assertEquals(response_get.json()[0]['tags'], self.data2['tags'])
+        self.assertEquals(response_get.json()[0]['respondiendo'], self.data2['respondiendo'])
+        self.assertEquals(response_get.json()[0]['mencionando'], self.data2['mencionando'])
+        self.assertEquals(response_get.json()[0]['From'], self.data2['From'])
+        self.assertEquals(response_get.json()[0]['fecha_hasta'], self.data2['fecha_hasta'])
+        self.assertEquals(response_get.json()[0]['fecha_desde'], self.data2['fecha_desde'])
+        self.assertEquals(response_get.json()[0]['fecha_peticion'], self.data2['fecha_peticion'])
+        self.assertEquals(response_get.json()[0]['fecha_finalizacion'], self.data2['fecha_finalizacion'])
+        self.assertEquals(response_get.json()[0]['finalizado'], self.data2['finalizado'])
+        self.assertEquals(response_get.json()[0]['tiene_tweets'], self.data2['tiene_tweets'])  
     
-    @tag("selenium")
-    def test_open_selenium(self):
-        print("intentando abrir selenium")
-        scraper = Scrapper()
-        scraper.test()
-        self.assertEquals(200, status.HTTP_200_OK)
+        
+    

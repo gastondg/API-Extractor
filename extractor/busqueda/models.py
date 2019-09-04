@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class BusquedaModel(models.Model):
     
-    id_busqueda = models.IntegerField(primary_key=True)
+    id_busqueda = models.IntegerField(unique=True)
     user_id = models.IntegerField(blank=False)
     
     ands = models.CharField(max_length=250, blank=True)
