@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from django.urls import reverse
 from django.test import tag
-
+from pprint import pprint
 
 from extractor_scripts.twitter_extractor import Scrapper
 
@@ -60,7 +60,7 @@ class TweetsTest(APITestCase):
         self.assertEquals(response.json()[0]['link'], self.data[0]['link'])
         self.assertEquals(response.json()[0]['label'], self.data[0]['label'])
 
-    
+    @tag("scrap")
     def test_post_busqueda(self):
 
         scraper = Scrapper()
@@ -74,8 +74,8 @@ class TweetsTest(APITestCase):
                     'tags' : "",
                     'respondiendo' : "",
                     'mencionando' : "",
-                    'From' : "@gdigiu",
-                    'fecha_hasta' : "2019-08-20",
+                    'From' : "@mercadopago",
+                    'fecha_hasta' : "2019-08-15",
                     'fecha_desde' : "2019-08-07",
                     'fecha_peticion' : "",
                     'fecha_finalizacion' : "",
@@ -88,5 +88,5 @@ class TweetsTest(APITestCase):
         response = self.client.post(self.url, tweets_json, format('json'))
         # response ok?
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        print(tweets_json[:2])
+        pprint(tweets_json[:5])
         
