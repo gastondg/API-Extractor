@@ -2,6 +2,7 @@ from .models import TweetsModel
 from .serializers import TweetsSerializer
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status
 
 
@@ -26,3 +27,22 @@ class TweetsListCreate(generics.ListCreateAPIView):
         return Response({
             'error' : tweets_set.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ByBusquedaIdView(APIView):
+
+    serializer_class = TweetsSerializer
+
+    def get(self, request, *args, **kwargs):
+        """
+        Get tweets por id de busqueda
+        Devuelve una lista de un elemento
+        """
+        if 'id_busqueda' not in kwargs:
+            return Response({
+                'error': 'id_busqueda required'
+            }, status=400)
+
+        tweets = TweetsModel.objects.filter(id_busqueda = kwargs['id_busqueda'])
+
+        return Response(TweetsSerializer(tweets, many=True).data)

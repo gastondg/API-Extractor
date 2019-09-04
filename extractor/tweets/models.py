@@ -11,3 +11,4 @@ class TweetsModel(models.Model):
     rts= models.IntegerField(blank=False, null=False)
     link= models.CharField(max_length=250, blank=True)
     label = models.CharField(max_length=250, blank=True)
+    id_busqueda = models.IntegerField()
