@@ -20,5 +20,6 @@ class BusquedaModel(models.Model):
     fecha_peticion = models.DateField(default=timezone.now)
     fecha_finalizacion = models.DateField(blank=True, null=True)
     finalizado = models.BooleanField(default=False)
+    tiene_tweets = models.BooleanField(default=False)
 
     
