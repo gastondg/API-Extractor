@@ -3,7 +3,8 @@ import datetime as dt
 import sys
 import requests
 import re
-
+import pandas as pd
+from pprint import pprint
 
 def get_busqueda(id_busqueda):
     # get a la base de datos
@@ -57,7 +58,7 @@ def armar_query(busqueda):
         # algunas de estas palabras
         ors = busqueda['ors']
         separador = " OR "
-        if query != "":
+        if ors != "":
             query = query + separador
         query = ands_ors(query, ors, separador)
 
@@ -101,19 +102,26 @@ def armar_query(busqueda):
     return query, fecha_desde, fecha_hasta
 
 
-def scrap_tweets(id_busqueda):
-    # get todos los tweets con la busqueda
-
-    # busqueda = get_busqueda()
-
-    #query = armar_query(busqueda)
-    query = "-chistosa -mental from:gdigiu"
-
-    list_of_tweets = query_tweets(query, begindate=dt.date(2019, 9, 19), enddate=dt.date(2019, 9, 22), lang='es')
-    #list_of_tweets = query_tweets(query, begindate=dt.date(2019, 9, 20), lang='es')
-
-    tweets = []
+#def scrap_tweets(id_busqueda):
+def scrap_tweets(busqueda):
+    """ 
+    Obtiene la busqueda con el id_busqueda y la realiza
+    """
+    # get busqueda
+    #busqueda = get_busqueda(id_busqueda)
     
+    # comprobar que la busqueda no sea vacia
+
+    # generar query
+    query, fecha_desde, fecha_hasta = armar_query(busqueda)
+    
+    # list_of_tweets = query_tweets(query, begindate=dt.date(2019, 9, 19), enddate=dt.date(2019, 9, 22), lang='es')
+    aaaa, mm, dd = int(fecha_desde[:4]), int(fecha_desde[5:7]), int(fecha_desde[8:])
+    AAAA, MM, DD = int(fecha_hasta[:4]), int(fecha_hasta[5:7]), int(fecha_hasta[8:])
+    list_of_tweets = query_tweets(query, begindate=dt.date(aaaa, mm, dd), enddate=dt.date(AAAA, MM, DD), lang='es')
+    
+    tweets = []
+    id_busqueda = 1
     try:
 
         # armo el json de cada tweet
@@ -121,8 +129,8 @@ def scrap_tweets(id_busqueda):
             # parseo cada tweet object a un json
             tweet_json = {
                 "id_busqueda" : id_busqueda,
-                "texto" : tweet.text,
-                "user" : tweet.username,
+                "text" : tweet.text,
+                "username" : tweet.username,
                 "fecha":  tweet.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 "replies": tweet.replies,
                 "rts ": tweet.retweets,
@@ -130,38 +138,38 @@ def scrap_tweets(id_busqueda):
                 "url": "https://twitter.com"+tweet.tweet_url,
             }
             tweets.append(tweet_json)
-        
+
+        # eliminar repetidos
+        # convertir a dataframe
+        df = pd.DataFrame(tweets)
+        df = df.drop_duplicates(subset='url')
+        tweets = df.to_dict(orient="records")
+
         return {
             "statusCode": 200,
             "body": tweets
         }
-    except Error as e:
+    except Exception as e:
         return e
 
 if __name__ == "__main__":
-    """ if len(sys.argv) == 1:
-        query = sys.argv
-        print("longitud 1")
-        print(query)
-    else:
-        print("longitud 2 o mas")
-        print(sys.argv) """
+    
 
     busqueda = {
           'id_busqueda' : 1,
           'user_id' : 1,                
-          'ands' : "charfield testing",
-          'phrase' : "charfield testing",
-          'ors' : "esto aquello",
+          'ands' : "@gdigiu",
+          'phrase' : "",
+          'ors' : "",
           'nots' : "sol playa",
-          'tags' : "delpo",
-          'respondiendo' : "gdigiu",
-          'mencionando' : "mercadolibre mercadopago",
-          'From' : "rogerfederer",
-          'fecha_hasta' : "2019-03-25",
-          'fecha_desde' : "2019-03-25",
+          'tags' : "",
+          'respondiendo' : "",
+          'mencionando' : "",
+          'From' : "",
+          'fecha_hasta' : "2019-09-18",
+          'fecha_desde' : "2019-09-15",
           'fecha_peticion' : "2019-03-25",
-          'fecha_finalizacion' : "2019-03-25",
+          'fecha_finalizacion' : "",
           'finalizado' : False,
           'tiene_tweets' : False,
           'es_cuenta' : False
@@ -169,6 +177,7 @@ if __name__ == "__main__":
 
     query, fecha_desde, fecha_hasta = armar_query(busqueda)
     print(query)
-
+    tweets = scrap_tweets(busqueda)["body"] 
+    pprint(tweets)
    # print(scrap_tweets(12))
     

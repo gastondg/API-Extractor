@@ -20,7 +20,7 @@ class BusquedaTest(APITestCase):
 
         self.data = {
           'id_busqueda' : 1,
-          'user_id' : 1,                
+          'user' : 1,                
           'ands' : "charfield testing",
           'phrase' : "charfield testing",
           'ors' : "charfield testing",
@@ -34,12 +34,14 @@ class BusquedaTest(APITestCase):
           'fecha_peticion' : "2019-03-25",
           'fecha_finalizacion' : "2019-03-25",
           'finalizado' : False,
-          'tiene_tweets' : False
+          'tiene_tweets' : False,
+          'es_cuenta' : False,
+          'nombre' : "nombre1",
            }
         
         self.data2 = {
           'id_busqueda' : 2,
-          'user_id' : 1,                
+          'user' : 1,                
           'ands' : "charfield testing",
           'phrase' : "charfield testing",
           'ors' : "charfield testing",
@@ -53,7 +55,9 @@ class BusquedaTest(APITestCase):
           'fecha_peticion' : "2019-03-25",
           'fecha_finalizacion' : "2019-03-25",
           'finalizado' : True,
-          'tiene_tweets' : True
+          'tiene_tweets' : True,
+          'nombre' : "nombre2",
+          'es_cuenta' : False,
            }
 
     @tag("prueba_create")
@@ -65,7 +69,8 @@ class BusquedaTest(APITestCase):
 
         #validar objeto
         self.assertEquals(response.json()['id_busqueda'], self.data['id_busqueda'])
-        self.assertEquals(response.json()['user_id'], self.data['user_id'])
+        self.assertEquals(response.json()['user'], self.data['user'])
+        self.assertEquals(response.json()['nombre'], self.data['nombre'])
         self.assertEquals(response.json()['ands'], self.data['ands'])
         self.assertEquals(response.json()['phrase'], self.data['phrase'])
         self.assertEquals(response.json()['ors'], self.data['ors'])
@@ -92,7 +97,7 @@ class BusquedaTest(APITestCase):
         self.assertEquals(response_get.status_code, status.HTTP_200_OK)
         #validar objeto
         self.assertEquals(response_get.json()[0]['id_busqueda'], self.data['id_busqueda'])
-        self.assertEquals(response_get.json()[0]['user_id'], self.data['user_id'])
+        self.assertEquals(response_get.json()[0]['user'], self.data['user'])
         self.assertEquals(response_get.json()[0]['ands'], self.data['ands'])
         self.assertEquals(response_get.json()[0]['phrase'], self.data['phrase'])
         self.assertEquals(response_get.json()[0]['ors'], self.data['ors'])
@@ -126,7 +131,7 @@ class BusquedaTest(APITestCase):
 
         #validar objeto
         self.assertEquals(response_get.json()[0]['id_busqueda'], self.data2['id_busqueda'])
-        self.assertEquals(response_get.json()[0]['user_id'], self.data2['user_id'])
+        self.assertEquals(response_get.json()[0]['user'], self.data2['user'])
         self.assertEquals(response_get.json()[0]['ands'], self.data2['ands'])
         self.assertEquals(response_get.json()[0]['phrase'], self.data2['phrase'])
         self.assertEquals(response_get.json()[0]['ors'], self.data2['ors'])
@@ -158,7 +163,7 @@ class BusquedaTest(APITestCase):
 
         #validar objeto
         self.assertEquals(response_get.json()[0]['id_busqueda'], self.data2['id_busqueda'])
-        self.assertEquals(response_get.json()[0]['user_id'], self.data2['user_id'])
+        self.assertEquals(response_get.json()[0]['user'], self.data2['user'])
         self.assertEquals(response_get.json()[0]['ands'], self.data2['ands'])
         self.assertEquals(response_get.json()[0]['phrase'], self.data2['phrase'])
         self.assertEquals(response_get.json()[0]['ors'], self.data2['ors'])
