@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from pprint import pprint
+import subprocess
 
 
 
@@ -22,10 +23,12 @@ class BusquedaListCreate(generics.ListCreateAPIView):
 
         if busqueda_set.is_valid():
             busqueda_set.save()
-            # si la busqueda es valida debemos:
-            # 1. comprobar que Selenium no este ocupado
-            # 2. empezas la busqueda
-            
+            # guardamos la busqueda sin finalizar y ejecutamos la busqueda
+            id_busqueda = busqueda_set.data['id_busqueda']
+            # ejecutamos el subproceso
+            path_env = "/home/gastondg/Proyecto/API-Extractor/lambdaextractor/env/bin/python3"
+            subprocess.run(path_env + ' prueba_lambda.py ' + str(id_busqueda) + ' >> prueba.txt | at now', shell=True)
+            # env/bin/python3    
             return Response(busqueda_set.data, status=status.HTTP_201_CREATED)
             
         return Response({
@@ -66,7 +69,8 @@ class ByBusquedaIdView(APIView):
                 'error': 'id_busqueda required'
             }, status=400)
 
-        busq = BusquedaModel.objects.filter(id_busqueda = kwargs['id_busqueda'])
+        #busq = BusquedaModel.objects.filter(id_busqueda = kwargs['id_busqueda'])
+        busq = BusquedaModel.objects.get(id_busqueda = kwargs['id_busqueda'])
 
         return Response(BusquedaSerializer(busq, many=True).data)
         

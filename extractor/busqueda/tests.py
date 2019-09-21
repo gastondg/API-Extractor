@@ -56,7 +56,7 @@ class BusquedaTest(APITestCase):
           'tiene_tweets' : True
            }
 
-    
+    @tag("prueba_create")
     def test_create(self):
 
         response = self.client.post(self.url, self.data, format('json'))
