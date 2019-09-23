@@ -103,12 +103,12 @@ def armar_query(busqueda):
 
 
 #def scrap_tweets(id_busqueda):
-def scrap_tweets(busqueda):
+def scrap_tweets(id_busqueda):
     """ 
     Obtiene la busqueda con el id_busqueda y la realiza
     """
     # get busqueda
-    #busqueda = get_busqueda(id_busqueda)
+    busqueda = get_busqueda(id_busqueda)
     
     # comprobar que la busqueda no sea vacia
 
@@ -145,39 +145,34 @@ def scrap_tweets(busqueda):
         df = df.drop_duplicates(subset='url')
         tweets = df.to_dict(orient="records")
 
-        return {
-            "statusCode": 200,
-            "body": tweets
-        }
+        return tweets
+        
     except Exception as e:
         return e
 
 if __name__ == "__main__":
     
+    id_busqueda = sys.argv[1]
 
-    busqueda = {
-          'id_busqueda' : 1,
-          'user_id' : 1,                
-          'ands' : "@gdigiu",
-          'phrase' : "",
-          'ors' : "",
-          'nots' : "sol playa",
-          'tags' : "",
-          'respondiendo' : "",
-          'mencionando' : "",
-          'From' : "",
-          'fecha_hasta' : "2019-09-18",
-          'fecha_desde' : "2019-09-15",
-          'fecha_peticion' : "2019-03-25",
-          'fecha_finalizacion' : "",
-          'finalizado' : False,
-          'tiene_tweets' : False,
-          'es_cuenta' : False
-           }
+    # tweets = scrap_tweets(id_busqueda)["body"] 
+    tweets = scrap_tweets(id_busqueda)
+    
+    if tweets == []:
+    
+        url_busqueda_sin_tweets = "topsens.com/busqueda_vacia/" + str(id_busqueda)
+        requests.post(url_busqueda_sin_tweets)
+    
+    else: # si trajo tweets
 
-    query, fecha_desde, fecha_hasta = armar_query(busqueda)
-    print(query)
-    tweets = scrap_tweets(busqueda)["body"] 
-    pprint(tweets)
-   # print(scrap_tweets(12))
+        # clasificar tweets
+        # armar nube de palabras
+
+        # POST a la BD 
+        # Tweets obtenidos
+        url_tweets = "Esta es la url de la bd de tweets"
+        response1 = requests.post(url_tweets, data=tweets)
+        
+        # Busqueda finalizada
+        url_busqueda_finalizada = "topsense.com/busqueda_fin/" + str(id_busqueda)
+        response2 = requests.post(url_busqueda_finalizada)
     

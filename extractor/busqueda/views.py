@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from pprint import pprint
 import subprocess
+from datetime import datetime
 
 
 
@@ -20,17 +21,19 @@ class BusquedaListCreate(generics.ListCreateAPIView):
 
         # obtengo el serializer pasando los datos del request
         busqueda_set = BusquedaSerializer(data=body, many=False)
+        #busqueda_set.data['fecha_peticion'] = datetime.now()
 
         if busqueda_set.is_valid():
             busqueda_set.save()
             # guardamos la busqueda sin finalizar y ejecutamos la busqueda
             id_busqueda = busqueda_set.data['id_busqueda']
             # ejecutamos el subproceso
-            path_env = "/home/gastondg/Proyecto/API-Extractor/lambdaextractor/env/bin/python3"
-            subprocess.run(path_env + ' prueba_lambda.py ' + str(id_busqueda) + ' >> prueba.txt | at now', shell=True)
+            path_env = "/env/bin/python3"
+            subprocess.run(path_env + ' /scripts/extractor_tweets.py ' + str(id_busqueda) + ' | at now', shell=True)
             # env/bin/python3    
             return Response(busqueda_set.data, status=status.HTTP_201_CREATED)
-            
+        print("imprimiendo errores")
+        print(busqueda_set.errors)
         return Response({
             'error' : busqueda_set.errors
         }, status=status.HTTP_400_BAD_REQUEST)
@@ -72,7 +75,7 @@ class ByBusquedaIdView(APIView):
         #busq = BusquedaModel.objects.filter(id_busqueda = kwargs['id_busqueda'])
         busq = BusquedaModel.objects.get(id_busqueda = kwargs['id_busqueda'])
 
-        return Response(BusquedaSerializer(busq, many=True).data)
+        return Response(BusquedaSerializer(busq, many=False).data)
         
 
 class FinalizadasView(generics.ListAPIView):
@@ -91,3 +94,30 @@ class FinalizadasView(generics.ListAPIView):
             queryset = BusquedaModel.objects.filter(finalizado=True)
 
         return queryset
+
+
+class BusquedaFinalizada(APIView):
+    
+    queryset = BusquedaModel.objects.all()
+    serializer_class = BusquedaSerializer
+
+    def put(self, request, *args, **kwargs):
+        """ 
+        Actualiza la busqueda a Finalizada = True
+        """
+        if 'id_busqueda' not in kwargs:
+            return Response({
+                'error': 'id_busqueda required'
+            }, status=400)
+
+        busq = BusquedaModel.objects.filter(id_busqueda = kwargs['id_busqueda']).update(finalizado=True, 
+                                            fecha_finalizacion = datetime.today().strftime('%Y-%m-%d'),
+                                            tiene_tweets=True)
+
+        if busq >= 1: 
+            return Response(status=200)
+        else:
+            # si da 0 algo paso y no se pudo hacer el update
+            # mirar log si ocurre este error
+            return Response(status=500)
+        

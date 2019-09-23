@@ -19,7 +19,8 @@ class BusquedaModel(models.Model):
     fecha_peticion = models.DateTimeField(default=timezone.now,blank=True,null=True)
     fecha_finalizacion = models.DateField(blank=True,null=True)
     finalizado = models.BooleanField(default=False)
-    es_cuenta = models.BooleanField()
+    es_cuenta = models.BooleanField(null = True)
+    tiene_tweets = models.BooleanField(null = True)
 
     def __str__(self):
         return str(self.user)+' '+str(self.fecha_peticion)
