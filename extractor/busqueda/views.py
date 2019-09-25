@@ -37,8 +37,13 @@ class BusquedaListCreate(generics.ListCreateAPIView):
         return Response({
             'error' : busqueda_set.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+    
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = BusquedaSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-    def get_queryset(self):
+    """ def get_queryset(self):
 
         filtros = {}
 
@@ -56,7 +61,7 @@ class BusquedaListCreate(generics.ListCreateAPIView):
         if filtros:
             return BusquedaModel.objects.filter(**filtros)
         else:
-            return BusquedaModel.objects.all()
+            return BusquedaModel.objects.all() """
 
 class ByBusquedaIdView(APIView):
 
