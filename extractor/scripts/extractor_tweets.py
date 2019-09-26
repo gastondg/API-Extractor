@@ -8,8 +8,10 @@ from pprint import pprint
 
 def get_busqueda(id_busqueda):
     # get a la base de datos
-    response = requests.get("http://127.0.0.1:8000/id_busqueda/" + str(id_busqueda))
-    return response
+    response = requests.get("http://127.0.0.1:8000/busqueda/id_busqueda/" + str(id_busqueda))
+    print("\nEsta es la respuesta del server de busqueda: ")
+    pprint(response.json())
+    return response.json()
 
 def ands_ors(query, x, separador):
     """ para obtener ands y ors """
@@ -111,55 +113,63 @@ def scrap_tweets(id_busqueda):
     busqueda = get_busqueda(id_busqueda)
     
     # comprobar que la busqueda no sea vacia
-
-    # generar query
-    query, fecha_desde, fecha_hasta = armar_query(busqueda)
-    
-    # list_of_tweets = query_tweets(query, begindate=dt.date(2019, 9, 19), enddate=dt.date(2019, 9, 22), lang='es')
-    aaaa, mm, dd = int(fecha_desde[:4]), int(fecha_desde[5:7]), int(fecha_desde[8:])
-    AAAA, MM, DD = int(fecha_hasta[:4]), int(fecha_hasta[5:7]), int(fecha_hasta[8:])
-    list_of_tweets = query_tweets(query, begindate=dt.date(aaaa, mm, dd), enddate=dt.date(AAAA, MM, DD), lang='es')
-    
-    tweets = []
-    id_busqueda = 1
-    try:
-
-        # armo el json de cada tweet
-        for tweet in list_of_tweets:
-            # parseo cada tweet object a un json
-            tweet_json = {
-                "id_busqueda" : id_busqueda,
-                "text" : tweet.text,
-                "username" : tweet.username,
-                "fecha":  tweet.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                "replies": tweet.replies,
-                "rts ": tweet.retweets,
-                "likes ": tweet.likes,
-                "url": "https://twitter.com"+tweet.tweet_url,
-            }
-            tweets.append(tweet_json)
-
-        # eliminar repetidos
-        # convertir a dataframe
-        df = pd.DataFrame(tweets)
-        df = df.drop_duplicates(subset='url')
-        tweets = df.to_dict(orient="records")
-
-        return tweets
+    if not busqueda:
+        # es decir, si busqueda es vacia
+        print("Busqueda vacia")
+    else:
+        # generar query
+        query, fecha_desde, fecha_hasta = armar_query(busqueda)
+        print("\nQuery armada: ")
+        pprint(query)
         
-    except Exception as e:
-        return e
+        # list_of_tweets = query_tweets(query, begindate=dt.date(2019, 9, 19), enddate=dt.date(2019, 9, 22), lang='es')
+        aaaa, mm, dd = int(fecha_desde[:4]), int(fecha_desde[5:7]), int(fecha_desde[8:])
+        AAAA, MM, DD = int(fecha_hasta[:4]), int(fecha_hasta[5:7]), int(fecha_hasta[8:])
+        list_of_tweets = query_tweets(query, begindate=dt.date(aaaa, mm, dd), enddate=dt.date(AAAA, MM, DD), lang='es')
+        
+        tweets = []
+        id_busqueda = 1
+        try:
+
+            # armo el json de cada tweet
+            for tweet in list_of_tweets:
+                # parseo cada tweet object a un json
+                tweet_json = {
+                    "id_busqueda" : id_busqueda,
+                    "text" : tweet.text,
+                    "username" : tweet.username,
+                    "fecha":  tweet.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    "replies": tweet.replies,
+                    "rts ": tweet.retweets,
+                    "likes ": tweet.likes,
+                    "url": "https://twitter.com"+tweet.tweet_url,
+                }
+                tweets.append(tweet_json)
+
+            # eliminar repetidos
+            # convertir a dataframe
+            df = pd.DataFrame(tweets)
+            df = df.drop_duplicates(subset='url')
+            tweets = df.to_dict(orient="records")
+
+            print("\nSe encontraron estos tweets:")
+            pprint(tweets)
+            return tweets
+            
+        except Exception as e:
+            return e
 
 if __name__ == "__main__":
     
-    id_busqueda = sys.argv[1]
+    id_busqueda = str(sys.argv[1])
+    print("Vamos a buscar la busqueda con id: " + str(id_busqueda))
 
     # tweets = scrap_tweets(id_busqueda)["body"] 
     tweets = scrap_tweets(id_busqueda)
     
     if tweets == []:
     
-        url_busqueda_sin_tweets = "topsens.com/busqueda_vacia/" + str(id_busqueda)
+        url_busqueda_sin_tweets = "http://127.0.0.1:8000/busqueda/id_busqueda/busqueda_vacia/" + str(id_busqueda)
         requests.post(url_busqueda_sin_tweets)
     
     else: # si trajo tweets
@@ -169,10 +179,15 @@ if __name__ == "__main__":
 
         # POST a la BD 
         # Tweets obtenidos
-        url_tweets = "Esta es la url de la bd de tweets"
+        print("\nGuardando tweets obtenidos al http://127.0.0.1:8000/tweets/")
+        url_tweets = "http://127.0.0.1:8000/tweets/"
         response1 = requests.post(url_tweets, data=tweets)
-        
+        print("\nRespuesta del POST a guardar tweets")
+        pprint(response1.json())
+
         # Busqueda finalizada
-        url_busqueda_finalizada = "topsense.com/busqueda_fin/" + str(id_busqueda)
+        url_busqueda_finalizada = "http://127.0.0.1:8000/busqueda/id_busqueda/busqueda_finalizada/" + str(id_busqueda)
         response2 = requests.post(url_busqueda_finalizada)
-    
+        print("\nRespuesta al POST a busqueda finalizada")
+        pprint(response2.json())
+        print("\nFin!")

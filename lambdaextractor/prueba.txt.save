@@ -1,0 +1,4 @@
+/home/gastondg/Proyecto/API-Extractor/env/bin/python3 /home/gastondg/Proyecto/API-Extractor/extractor/busqueda/tests.py
+['prueba_sys.py', '2']
+imprimiendo sys argv
+['prueba_sys.py', '2']

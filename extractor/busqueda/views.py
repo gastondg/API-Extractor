@@ -24,16 +24,21 @@ class BusquedaListCreate(generics.ListCreateAPIView):
         #busqueda_set.data['fecha_peticion'] = datetime.now()
 
         if busqueda_set.is_valid():
-            busqueda_set.save()
+            # busqueda_set.save()
             # guardamos la busqueda sin finalizar y ejecutamos la busqueda
             id_busqueda = busqueda_set.data['id_busqueda']
             # ejecutamos el subproceso
+            #path = "/home/gastondg/Proyecto/API-Extractor"
             path_env = "/env/bin/python3"
-            subprocess.run(path_env + ' /scripts/extractor_tweets.py ' + str(id_busqueda) + ' | at now', shell=True)
-            # env/bin/python3    
+            path_script ="/scripts/extractor_tweets.py"
+            s1 = subprocess.run(path_env + " " + path_script + " " + str(id_busqueda) + " | at now >> prueba2.txt", shell=True)
+            s2 = subprocess.run("/env/bin/python3 /scripts/prueba_print.py 3 | at now >> prueba_print.txt", shell = True)
+            print("Imprimiendo resultados de s1: ")
+            print(s1)
+            print("Imprimiendo resultados de s2: ")
+            print(s2)               
             return Response(busqueda_set.data, status=status.HTTP_201_CREATED)
-        print("imprimiendo errores")
-        print(busqueda_set.errors)
+       
         return Response({
             'error' : busqueda_set.errors
         }, status=status.HTTP_400_BAD_REQUEST)
@@ -43,25 +48,6 @@ class BusquedaListCreate(generics.ListCreateAPIView):
         serializer = BusquedaSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    """ def get_queryset(self):
-
-        filtros = {}
-
-        if 'id_busqueda' in self.request.GET:
-            filtros['id_busqueda'] = self.request.GET.get('id_busqueda')
-
-        if 'user_id' in self.request.GET:
-            filtros['user_id'] = self.request.GET.get('user_id')
-
-        if 'finalizado' in self.request.GET:
-                filtros['finalizado'] = self.request.GET.get('finalizado')
-                # devuelve el no finalizado mas viejo, es decir el primero de la cola
-                return BusquedaModel.objects.filter(**filtros).order_by("fecha_peticion")[:1]
-        
-        if filtros:
-            return BusquedaModel.objects.filter(**filtros)
-        else:
-            return BusquedaModel.objects.all() """
 
 class ByBusquedaIdView(APIView):
 
@@ -81,7 +67,27 @@ class ByBusquedaIdView(APIView):
         busq = BusquedaModel.objects.get(id_busqueda = kwargs['id_busqueda'])
 
         return Response(BusquedaSerializer(busq, many=False).data)
-        
+
+
+class ByUserIdView(APIView):
+
+    serializer_class = BusquedaSerializer
+
+    def get(self, request, *args, **kwargs):
+        """
+        Get busqueda con ese id
+        Devuelve una lista de un elemento
+        """
+        if 'user' not in kwargs:
+            return Response({
+                'error': 'user id required'
+            }, status=400)
+
+        #busq = BusquedaModel.objects.filter(id_busqueda = kwargs['id_busqueda'])
+        busq = BusquedaModel.objects.get(user = kwargs['user'])
+
+        return Response(BusquedaSerializer(busq, many=False).data)
+
 
 class FinalizadasView(generics.ListAPIView):
     """
@@ -126,3 +132,27 @@ class BusquedaFinalizada(APIView):
             # mirar log si ocurre este error
             return Response(status=500)
         
+class BusquedaVacia(APIView):
+    
+    queryset = BusquedaModel.objects.all()
+    serializer_class = BusquedaSerializer
+
+    def put(self, request, *args, **kwargs):
+        """ 
+        Actualiza la busqueda a tiene_tweets = False
+        """
+        if 'id_busqueda' not in kwargs:
+            return Response({
+                'error': 'id_busqueda required'
+            }, status=400)
+
+        busq = BusquedaModel.objects.filter(id_busqueda = kwargs['id_busqueda']).update(finalizado=True, 
+                                            fecha_finalizacion = datetime.today().strftime('%Y-%m-%d'),
+                                            tiene_tweets=False)
+
+        if busq >= 1: 
+            return Response(status=200)
+        else:
+            # si da 0 algo paso y no se pudo hacer el update
+            # mirar log si ocurre este error
+            return Response(status=500)

@@ -46,7 +46,7 @@ class BusquedaTest(APITestCase):
            }
         
         self.data2 = {
-          'id_busqueda' : 2,
+          #'id_busqueda' : 2,
           'user' : 1,                
           'ands' : "esta es la busqueda 2",
           'phrase' : "charfield testing",
@@ -67,7 +67,7 @@ class BusquedaTest(APITestCase):
            }
 
         self.data3 = {
-          'id_busqueda' : 3,
+          #'id_busqueda' : 3,
           'user' : 3,                
           'ands' : "esta es la busqueda 3",
           'phrase' : "charfield testing",
@@ -87,7 +87,7 @@ class BusquedaTest(APITestCase):
           'nombre' : "nombre1",
            }    
 
-    @tag("busq1")
+    @tag("busqpost")
     def test_create(self):
 
         response = self.client.post(self.url, self.data, format('json'))
@@ -151,6 +151,41 @@ class BusquedaTest(APITestCase):
         # definimos url para el get 
         id_busqueda = self.data2['id_busqueda']
         url = reverse('busqueda:busquedaById', args=[id_busqueda])
+        
+        # hacemos el get
+        response_get = self.client.get(url)
+        self.assertEquals(response_get.status_code, status.HTTP_200_OK)
+
+
+        #validar objeto
+        self.assertEquals(response_get.json()['id_busqueda'], self.data2['id_busqueda'])
+        self.assertEquals(response_get.json()['user'], self.data2['user'])
+        self.assertEquals(response_get.json()['ands'], self.data2['ands'])
+        self.assertEquals(response_get.json()['phrase'], self.data2['phrase'])
+        self.assertEquals(response_get.json()['ors'], self.data2['ors'])
+        self.assertEquals(response_get.json()['nots'], self.data2['nots'])
+        self.assertEquals(response_get.json()['tags'], self.data2['tags'])
+        self.assertEquals(response_get.json()['respondiendo'], self.data2['respondiendo'])
+        self.assertEquals(response_get.json()['mencionando'], self.data2['mencionando'])
+        self.assertEquals(response_get.json()['From'], self.data2['From'])
+        self.assertEquals(response_get.json()['fecha_hasta'], self.data2['fecha_hasta'])
+        self.assertEquals(response_get.json()['fecha_desde'], self.data2['fecha_desde'])
+        #self.assertEquals(response_get.json()['fecha_peticion'], self.data2['fecha_peticion'])
+        #self.assertEquals(response_get.json()['fecha_finalizacion'], self.data2['fecha_finalizacion'])
+        self.assertEquals(response_get.json()['finalizado'], self.data2['finalizado'])
+        self.assertEquals(response_get.json()['tiene_tweets'], self.data2['tiene_tweets'])  
+
+
+    @tag("busquserid")
+    def test_get_byUserId(self):
+        # primero el post para guardar los datos
+        response = self.client.post(self.url, self.data2, format('json'))
+        # response ok?
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+        # definimos url para el get 
+        user = self.data2['user']
+        url = reverse('busqueda:userById', args=[user])
         
         # hacemos el get
         response_get = self.client.get(url)
