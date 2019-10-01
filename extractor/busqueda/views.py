@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from pprint import pprint
 import subprocess
 from datetime import datetime
+import os
 
 
 
@@ -29,10 +30,11 @@ class BusquedaListCreate(generics.ListCreateAPIView):
             id_busqueda = busqueda_set.data['id_busqueda']
             # ejecutamos el subproceso
             #path = "/home/gastondg/Proyecto/API-Extractor"
-            path_env = "/env/bin/python3"
-            path_script ="/scripts/extractor_tweets.py"
-            s1 = subprocess.run(path_env + " " + path_script + " " + str(id_busqueda) + " | at now >> prueba2.txt", shell=True)
-            s2 = subprocess.run("/env/bin/python3 /scripts/prueba_print.py 3 | at now >> prueba_print.txt", shell = True)
+            path_env = "../env/bin/python3"
+            path_script ="./scripts/extractor_tweets.py"
+            print(os.getcwd())
+            s1 = subprocess.run(path_env + " " + path_script + " " + str(id_busqueda) + " >> prueba2.txt | at now", shell=True)
+            s2 = subprocess.run("../env/bin/python3 ./scripts/prueba_print.py 3 >> prueba_print.txt | at now ", shell = True)
             print("Imprimiendo resultados de s1: ")
             print(s1)
             print("Imprimiendo resultados de s2: ")

@@ -1,3 +1,0 @@
-['prueba_sys.py', '2']
-imprimiendo sys argv
-['prueba_sys.py', '2']

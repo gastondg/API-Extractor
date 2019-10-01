@@ -8,7 +8,7 @@ from pprint import pprint
 
 def get_busqueda(id_busqueda):
     # get a la base de datos
-    response = requests.get("http://127.0.0.1:8000/busqueda/id_busqueda/" + str(id_busqueda))
+    response = requests.get("http://127.0.0.1:8000/v1/api/busqueda/id_busqueda/" + str(id_busqueda))
     print("\nEsta es la respuesta del server de busqueda: ")
     pprint(response.json())
     return response.json()
@@ -159,6 +159,9 @@ def scrap_tweets(id_busqueda):
         except Exception as e:
             return e
 
+print("Nombre de main")
+print(__name__)
+
 if __name__ == "__main__":
     
     id_busqueda = str(sys.argv[1])
@@ -169,7 +172,7 @@ if __name__ == "__main__":
     
     if tweets == []:
     
-        url_busqueda_sin_tweets = "http://127.0.0.1:8000/busqueda/id_busqueda/busqueda_vacia/" + str(id_busqueda)
+        url_busqueda_sin_tweets = "http://127.0.0.1:8000/v1/api/busqueda/id_busqueda/busqueda_vacia/" + str(id_busqueda)
         requests.post(url_busqueda_sin_tweets)
     
     else: # si trajo tweets
@@ -179,14 +182,14 @@ if __name__ == "__main__":
 
         # POST a la BD 
         # Tweets obtenidos
-        print("\nGuardando tweets obtenidos al http://127.0.0.1:8000/tweets/")
-        url_tweets = "http://127.0.0.1:8000/tweets/"
+        print("\nGuardando tweets obtenidos al http://127.0.0.1:8000/v1/api/tweets/")
+        url_tweets = "http://127.0.0.1:8000/v1/api/tweets/"
         response1 = requests.post(url_tweets, data=tweets)
         print("\nRespuesta del POST a guardar tweets")
         pprint(response1.json())
 
         # Busqueda finalizada
-        url_busqueda_finalizada = "http://127.0.0.1:8000/busqueda/id_busqueda/busqueda_finalizada/" + str(id_busqueda)
+        url_busqueda_finalizada = "http://127.0.0.1:8000/v1/api/busqueda/id_busqueda/busqueda_finalizada/" + str(id_busqueda)
         response2 = requests.post(url_busqueda_finalizada)
         print("\nRespuesta al POST a busqueda finalizada")
         pprint(response2.json())

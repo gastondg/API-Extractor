@@ -1,0 +1,38 @@
+Nombre de main
+__main__
+Vamos a buscar la busqueda con id: 3
+
+Esta es la respuesta del server de busqueda: 
+{'From': '',
+ 'ands': '@gdigiu',
+ 'es_cuenta': False,
+ 'fecha_desde': '2019-08-01',
+ 'fecha_finalizacion': None,
+ 'fecha_hasta': '2019-09-25',
+ 'fecha_peticion': '2019-09-25T19:59:40Z',
+ 'finalizado': False,
+ 'id_busqueda': 3,
+ 'mencionando': '',
+ 'nombre': 'test',
+ 'nots': '',
+ 'ors': '',
+ 'phrase': '',
+ 'respondiendo': '@carmennsosa',
+ 'tags': '',
+ 'tiene_tweets': None,
+ 'user': 3}
+
+Query armada: 
+'@gdigiu to:@carmennsosa'
+
+Se encontraron estos tweets:
+[{'fecha': '2019-09-20T00:40:41Z',
+  'id_busqueda': 1,
+  'likes ': 0,
+  'replies': 0,
+  'rts ': 0,
+  'text': 'JAJJA',
+  'url': 'https://twitter.com/gdigiu/status/1174845803338305541',
+  'username': 'gdigiu'}]
+
+Guardando tweets obtenidos al http://127.0.0.1:8000/v1/api/tweets/
